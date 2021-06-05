@@ -14,12 +14,12 @@ const Cart = (props) => {
 
     // bound to ensure the id is added to this function
     const cartItemRemoveHandler = id => {
-
+        cartCTX.removeItem(id);
     }
 
     // bind to preconfigure the argument to this function
     const cartItemAddHandler = item => {
-
+        cartCTX.addItem({...item, amount: 1});
     }
 
     const cartItems = <ul className={classes['cart-items']}>{
