@@ -1,15 +1,21 @@
 import useInput from "../../hooks/use-input";
+import classes from "./Checkout.module.css";
 
 const validateInput = (inputStr) => {
     return inputStr.trim() !== "";
 }
 
+const getClasses = (errorStatus) => {
+    return errorStatus ? `${classes.control} ${classes.invalid}` : classes.control;
+}
+
 const createOrderString = (order) => {
-    let output = "";
+    let output = [];
     for(const o in order) {
-        output += order[o].amount + " " + order[o].name + ", ";
+        let currOrder = order[o].amount + " " + order[o].name;
+        output.push(currOrder);
     }
-    return output.substring(0, output.length - 2);
+    return output;
 }
 
 const Checkout = (props) => {
@@ -17,7 +23,6 @@ const Checkout = (props) => {
     const {
         value: nameInputValue,
         hasError: nameInputHasError,
-        isTouched: nameInputIsTouched,
         inputBlurHandler: nameInputBlurHandler,
         inputChangeHandler: nameInputChangeHandler,
         reset: resetName
@@ -26,7 +31,6 @@ const Checkout = (props) => {
     const {
         value: cityInputValue,
         hasError: cityInputHasError,
-        isTouched: cityInputIsTouched,
         inputBlurHandler: cityInputBlurHandler,
         inputChangeHandler: cityInputChangeHandler,
         reset: resetCity
@@ -35,7 +39,6 @@ const Checkout = (props) => {
     const {
         value: streetInputValue,
         hasError: streetInputHasError,
-        isTouched: streetInputIsTouched,
         inputBlurHandler: streetInputBlurHandler,
         inputChangeHandler: streetInputChangeHandler,
         reset: resetStreet
@@ -44,7 +47,6 @@ const Checkout = (props) => {
     const {
         value: zipInputValue,
         hasError: zipInputHasError,
-        isTouched: zipInputIsTouched,
         inputBlurHandler: zipInputBlurHandler,
         inputChangeHandler: zipInputChangeHandler,
         reset: resetZip
@@ -59,19 +61,23 @@ const Checkout = (props) => {
             street: streetInputValue,
             zipcode: zipInputValue
         }
-        const res = await fetch("https://react-hooks-example-db-b2259-default-rtdb.firebaseio.com/orders.json", {
+        await fetch("https://react-hooks-example-db-b2259-default-rtdb.firebaseio.com/orders.json", {
             method: "POST",
             body: JSON.stringify(orderData),
             headers: {
                 "Content-Type": "application/json"
             }
         });
-        console.log(orderData);
+        resetStreet();
+        resetCity();
+        resetName();
+        resetZip();
+        props.orderSent();
     }
 
     return <>
-        <form onSubmit={postFormData}>
-            <div>
+        <form onSubmit={postFormData} className={classes.form}>
+            <div className={getClasses(nameInputHasError)}>
                 <label htmlFor="name">Name</label>
                 <input
                     id="name"
@@ -81,7 +87,7 @@ const Checkout = (props) => {
                     onBlur={nameInputBlurHandler}
                 />
             </div>
-            <div>
+            <div className={getClasses(cityInputHasError)}>
                 <label htmlFor="city">City</label>
                 <input
                     id="city"
@@ -91,7 +97,7 @@ const Checkout = (props) => {
                     onBlur={cityInputBlurHandler}
                 />
             </div>
-            <div>
+            <div className={getClasses(streetInputHasError)}>
                 <label htmlFor="street">Street</label>
                 <input
                     id="street"
@@ -101,7 +107,7 @@ const Checkout = (props) => {
                     onBlur={streetInputBlurHandler}
                 />
             </div>
-            <div>
+            <div className={getClasses(zipInputHasError)}>
                 <label htmlFor="zipcode">Zip Code</label>
                 <input
                     id="zipcode"
@@ -111,7 +117,10 @@ const Checkout = (props) => {
                     onBlur={zipInputBlurHandler}
                 />
             </div>
-            <button>Confirm</button>
+            <div className={classes.actions}>
+                <button>Confirm</button>
+                <button onClick={props.cancel}>Cancel</button>
+            </div>
         </form>
     </>
 

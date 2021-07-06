@@ -25,6 +25,12 @@ const Cart = (props) => {
         cartCTX.addItem({...item, amount: 1});
     }
 
+    const orderSent = () => {
+        cartCTX.orderSent();
+        setReadyToOrder(false);
+        props.onClose();
+    }
+
     const readyToOrderHandler = () => {
         setReadyToOrder(true);
     }
@@ -51,8 +57,7 @@ const Cart = (props) => {
             <span>{totalAmount}</span>
         </div>
             { readyToOrder && <div>
-                <Checkout currentItems={cartCTX.items}/>
-                <button onClick={cancelReadyToOrder}>Cancel</button>
+                <Checkout orderSent={orderSent} cancel={cancelReadyToOrder} currentItems={cartCTX.items}/>
             </div> }
 
             { !readyToOrder && <div className={classes.actions}>
